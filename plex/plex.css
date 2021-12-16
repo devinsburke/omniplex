@@ -1,0 +1,36 @@
+.plex-filter .plex-control-label {
+    cursor: pointer !important;
+}
+.plex-filter .plex-control-label label:hover,
+omni-menu omni-action:hover {
+    cursor: pointer;
+    color: var(--form-info-anchor-hover-color);
+}
+omni-menu omni-action[disabled] {
+    cursor: not-allowed;
+    color: var(--content-color-text-muted);
+    pointer-events: none;
+}
+
+omni-menu {
+    box-shadow: 0 2px 3px rgb(0 0 0 / 40%);
+    background: var(--form-background-color);
+    border: 1px solid var(--navbar-color-bg);
+    border-radius: 3px;
+    cursor: default;
+    display: none;
+    min-height: 10px;
+    min-width: 100px;
+    padding: 0.5em;
+    position: absolute;
+    top: 2em;
+    transform: translate(-100%);
+    z-index: 9999;
+}
+.omni-menu-open omni-menu {
+    display: inline-block;
+}
+
+.omni-hidden {
+    display: none !important;
+}

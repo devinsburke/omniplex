@@ -4,7 +4,8 @@ class AppHandler {
 }
 
 class AppHandlerControlElement {
-    constructor(container, trigger, titleText, uniqueId, isRequired) {
+    constructor(context, container, trigger, titleText, uniqueId, isRequired) {
+        this.context = context;
         this.container = container;
         this.trigger = trigger;
         this.titleText = titleText;

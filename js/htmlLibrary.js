@@ -14,11 +14,12 @@ class htmlLibrary {
     
     normalizeClasses(...className) {
         const list = [];
-        className.forEach(cls => {
-            const sublist = cls.split(' ');
-            sublist.forEach(sub => list.push(this.schemaName(sub)));
-        });
+        className.forEach(cls => cls.split(' ').forEach(sub => list.push(this.schemaName(sub))));
         return list;
+    }
+
+    addClass(element, className) {
+        element.classList.add(this.schemaName(className));
     }
 
     toggleClass(element, className) {

@@ -10,10 +10,12 @@
   "content_scripts": [{
     "matches": ["*://*.plex.com/*"],
     "run_at": "document_idle",
-    "css": ["plex/plex.css"],
+    "css": [
+      "plex/plex.css"
+    ],
     "js": [
       "js/htmlLibrary.js",
-      "js/appHandler.js",
+      "js/base.js",
       "js/hideShowService.js",
       "plex/plexHandler.js"
     ]

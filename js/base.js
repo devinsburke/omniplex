@@ -1,6 +1,6 @@
 class AppHandler {
-    constructor() { }
-    *getControlElements(doc) { alert('not implemented'); yield null; }
+    *getControlElements(doc) { }
+    getPageId(url) { }
 }
 
 class AppHandlerControlElement {
@@ -11,4 +11,13 @@ class AppHandlerControlElement {
         this.uniqueId = uniqueId;
         this.isRequired = isRequired;
     }
+}
+
+class Service {
+    constructor(doc, appHandler, lib) {
+        this.doc = doc;
+        this.appHandler = appHandler;
+        this.lib = lib;
+    }
+    initiate() { }
 }

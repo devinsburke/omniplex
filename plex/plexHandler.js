@@ -9,12 +9,13 @@ class PlexHandler extends AppHandler {
         }
     }
 
-    getUniqueUrl(url) {
+    getPageId(url) {
         return `${url.host}${url.pathname}`;
     }
 }
 
+const services = [HideShowService];
+
 const lib = new htmlLibrary('omni');
 const appHandler = new PlexHandler();
-const hideShow = new HideShowService(document, appHandler, lib);
-hideShow.initiate();
+services.forEach(s => new s(document, appHandler, lib).initiate());

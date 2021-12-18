@@ -1,16 +1,44 @@
-.plex-filter .plex-control-label {
+.omni-app-menu-container {
     cursor: pointer !important;
 }
-.plex-filter .plex-control-label label:hover,
-omni-menu omni-action:hover {
-    cursor: pointer;
-    color: var(--form-info-anchor-hover-color);
+    .omni-app-menu-container > * {
+        cursor: pointer !important;
+    }
+    .omni-app-menu-container:hover {
+        color: var(--form-info-anchor-hover-color);
+    }
+        .omni-app-menu-container:hover omni-menu-trigger {
+            display: inline-block;
+        }
+
+omni-menu-trigger {
+    display: none;
+    padding: 0 0 0 0.3em;
+    position: absolute;
+    z-index: 100;
 }
-omni-menu omni-action[disabled] {
-    cursor: not-allowed;
-    color: var(--content-color-text-muted);
-    pointer-events: none;
-}
+    omni-menu-trigger::after {
+        background: var(--clickable-color-bg);
+        border: 1px solid var(--clickable-border-color);
+        border-radius: 3px;
+        color: var(--clickable-color-text);
+        content: '\e161';
+        display: inline-block;
+        font-family: 'plex-icons';
+        height: 1.3em;
+        line-height: 1;
+        text-align: center;
+        width: 1.3em;
+    }
+    omni-menu-trigger:hover::after,
+    omni-menu-trigger.omni-open::after {
+        background: var(--clickable-color-bg-hover);
+        border-color: var(--clickable-border-color-hover);
+    }
+    omni-menu-trigger.omni-open,
+    omni-menu-trigger.omni-open omni-menu {
+        display: inline-block;
+    }
 
 omni-menu {
     box-shadow: 0 2px 3px rgb(0 0 0 / 40%);
@@ -23,13 +51,22 @@ omni-menu {
     min-width: 100px;
     padding: 0.5em;
     position: absolute;
-    top: 2em;
-    transform: translate(-100%);
+    text-align: left;
+    transform: translateX(calc(1.3em - 100%));
+    top: 1.3em;
     z-index: 9999;
 }
-.omni-menu-open omni-menu {
-    display: inline-block;
-}
+    omni-menu omni-action {
+        cursor: pointer;
+        white-space: nowrap;
+    }
+        omni-menu omni-action:hover {
+            color: var(--form-info-anchor-hover-color);
+        }
+        omni-menu omni-action[disabled] {
+            cursor: not-allowed;
+            color: var(--content-color-text-muted);
+        }
 
 .omni-hidden {
     display: none !important;

@@ -1,5 +1,10 @@
 class HideShowService extends Service {
     initiate() {
+        const settings = this.getPageSettings(window.location);
+        this.lib.forEach(settings.hiddenControls, (prop, val) => {
+            
+        });
+
         for (const ctrl of this.appHandler.getControlElements(this.doc)) {
             this.appendMenu(ctrl);
         }

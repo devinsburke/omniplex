@@ -1,15 +1,16 @@
 class AppHandler {
+    name = '';
     *getControlElements(doc) { }
     getPageId(url) { }
 }
 
 class AppHandlerControlElement {
-    constructor(context, container, trigger, titleText, uniqueId, isRequired) {
-        this.context = context;
+    constructor(controlType, container, trigger, titleText, selector, isRequired) {
+        this.controlType = controlType;
         this.container = container;
         this.trigger = trigger;
         this.titleText = titleText;
-        this.uniqueId = uniqueId;
+        this.selector = selector;
         this.isRequired = isRequired;
     }
 }
@@ -21,4 +22,8 @@ class Service {
         this.lib = lib;
     }
     initiate() { }
+
+    getPageSettings(urlObj) {
+        return this.lib.getUserData(`app-${this.appHandler.name}-page-${this.appHandler.getPageId(urlObj)}`);
+    }
 }

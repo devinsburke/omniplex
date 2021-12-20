@@ -44,4 +44,37 @@ class htmlLibrary {
     schemaName(name, addDataPrefix=false) {
         return !name.startsWith('-') ? name : `${addDataPrefix ? 'data-' : ''}${this.appPrefix}${name}`;
     }
+
+    forEach(obj, callback) {
+        if (!obj)
+            return;
+
+        for (const prop in obj) {
+            if (obj.hasOwnProperty(prop)) {
+                await callback(prop, obj[prop]);
+            }
+        }
+    }
+
+    getChromeError() {
+        return chrome.runtime.lastError && Error(chrome.runtime.lastError.message);
+    }
+
+    getUserData(keys) {
+        return new Promise((resolve, reject) => chrome.storage.sync.get(keys, result => {
+            if (chrome.runtime.lastError)
+                reject(Error(chrome.runtime.lastError.message));
+            else
+                resolve(result);
+        }));
+    }
+
+    setUserData(data) {
+        return new Promise((resolve, reject) => chrome.storage.sync.set(data, result => {
+            if (chrome.runtime.lastError)
+                reject(Error(chrome.runtime.lastError.message));
+            else
+                resolve(result);
+        }));
+    }
 }

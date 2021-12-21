@@ -1,8 +1,11 @@
 class htmlLibrary {
-    constructor(appPrefix) {
-        this.appPrefix = appPrefix;
+    appSchema;
+
+    constructor(appSchema) {
+        this.appSchema = appSchema;
     }
 
+    // SECTION: Element Manipulation.
     buildElement(parent, tag, classList=[], attributeDict={}, innerText='') {
         var el = document.createElement(this.schemaName(tag));
         el.innerText = innerText;
@@ -11,70 +14,99 @@ class htmlLibrary {
         parent.appendChild(el);
         return el;
     }
-    
-    normalizeClasses(...className) {
+    normalizeClasses(...classNames) {
         const list = [];
-        className.forEach(cls => cls.split(' ').forEach(sub => list.push(this.schemaName(sub))));
+        classNames.forEach(cls => cls.split(' ').forEach(sub => list.push(this.schemaName(sub))));
         return list;
     }
-
     addClass(element, className) {
         element.classList.add(this.schemaName(className));
     }
-
+    hasClass(element, className) {
+        element.classList.contains(this.schemaName(className));
+    }
     toggleClass(element, className) {
         element.classList.toggle(this.schemaName(className));
     }
-
-    toggleOnClickOut(container, trigger, className) {
+    toggleOnClickOut(clickElement, className, applyClassToElement=clickElement) {
         className = this.schemaName(className);
         const listener = (e) => {
-            if (!container.contains(e.target)) {
-                container.classList.remove(className);
-                container.ownerDocument.removeEventListener('click', listener);
+            if (!applyClassToElement.contains(e.target)) {
+                applyClassToElement.classList.remove(className);
+                applyClassToElement.ownerDocument.removeEventListener('click', listener);
             }
         }
-        trigger.addEventListener('click', () => {
-            container.classList.toggle(className);
-            if (container.classList.contains(className))
-                container.ownerDocument.addEventListener('click', listener);
+        clickElement.addEventListener('click', () => {
+            applyClassToElement.classList.toggle(className);
+            if (applyClassToElement.classList.contains(className))
+                applyClassToElement.ownerDocument.addEventListener('click', listener);
         });
+    }
+
+    getAttribute(element, attributeName) {
+        return element[this.schemaName(attributeName, true)];
+    }
+    setAttribute(element, attributeName, value) {
+        if (element)
+            element[this.schemaName(attributeName, true)] = value;
+    }
+
+    setOrDeleteAtKey(obj, key, value) {
+        value != null ? obj[key] = value : delete obj[key];
+    }
+
+    setOrDeleteAtPath(obj, value, ...paths) {
+        if (!paths)
+            return value;
+
+        let currentNode = obj;
+        for (const i=0, l=paths.length-1; i < l; i++) {
+            const path = paths[i];
+            const nextNode = currentNode[path];
+            if (nextNode == null) {
+                if (value == null)
+                    return obj;
+                nextNode = {};
+                currentNode[path] = nextNode;
+            }
+            currentNode = deeperValue;
+        }
+        this.setOrDeleteAtKey(currentNode, paths[paths.length-1], value);
+        return obj;
     }
     
     schemaName(name, addDataPrefix=false) {
-        return !name.startsWith('-') ? name : `${addDataPrefix ? 'data-' : ''}${this.appPrefix}${name}`;
+        return !name.startsWith('-') ? name : `${addDataPrefix ? 'data-' : ''}${this.appSchema}${name}`;
     }
 
-    forEach(obj, callback) {
+    async forEachSync(obj, callback) {
         if (!obj)
             return;
-
-        for (const prop in obj) {
-            if (obj.hasOwnProperty(prop)) {
+        else if (Array.isArray(obj))
+            for (const i = 0, l = obj.length; i < l; i++)
+                await callback(i, obj[i]);
+        else
+            for (const prop of obj)
                 await callback(prop, obj[prop]);
-            }
-        }
     }
 
-    getChromeError() {
-        return chrome.runtime.lastError && Error(chrome.runtime.lastError.message);
+    async forEachAsync(obj, callback) {
+        if (!obj)
+            return;
+        if (Array.isArray(obj))
+            await Promise.all(obj.map(async (o, i) => await callback(i, o)));
+        else
+            await Promise.all(Object.keys(obj).map(async k => await callback(k, obj[k])));
     }
 
-    getUserData(keys) {
-        return new Promise((resolve, reject) => chrome.storage.sync.get(keys, result => {
-            if (chrome.runtime.lastError)
-                reject(Error(chrome.runtime.lastError.message));
-            else
-                resolve(result);
-        }));
-    }
+    getUserData = async keys => await this.#storagePromise(this.#storageSyncGet, keys);
+    setUserData = async (key, value) => await this.#storagePromise(this.#storageSyncSet, {[key]:value});
+    setOrDeleteUserData = async (key, value) => value == null ? this.deleteUserData(key) : this.setUserData(key, value)
+    deleteUserData = async key => await this.#storagePromise(this.#storageSyncRemove, key);
 
-    setUserData(data) {
-        return new Promise((resolve, reject) => chrome.storage.sync.set(data, result => {
-            if (chrome.runtime.lastError)
-                reject(Error(chrome.runtime.lastError.message));
-            else
-                resolve(result);
-        }));
-    }
+
+    #storageSyncSet = (data, fn) => chrome.storage.sync.set(data, fn);
+    #storageSyncGet = (data, fn) => chrome.storage.sync.get(data, fn);
+    #storageSyncRemove = (data, fn) => chrome.storage.sync.remove(data, fn);
+    #storagePromise = (fn, param) => new Promise(async (pass, fail) => fn(param, d => chrome.runtime.lastError ? fail(Error(chrome.runtime.lastError.message)) : pass(d)));
 }

@@ -10,14 +10,20 @@
   "content_scripts": [{
     "matches": ["*://*.plex.com/*"],
     "run_at": "document_idle",
+    "js": ["js/event.idle.js"]
+  },
+  {
+    "matches": ["*://*.plex.com/*"],
+    "run_at": "document_start",
     "css": [
-      "plex/plex.css"
+      "apps/plex.css"
     ],
     "js": [
-      "js/htmlLibrary.js",
+      "js/library.js",
       "js/base.js",
-      "js/hideShowService.js",
-      "plex/plexHandler.js"
+      "services/hideShow.js",
+      "apps/plexHandler.js",
+      "js/event.start.js"
     ]
   }],
   "permissions": ["storage", "activeTab", "scripting"],

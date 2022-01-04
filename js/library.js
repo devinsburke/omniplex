@@ -19,15 +19,10 @@ class htmlLibrary {
         classNames.forEach(cls => cls.split(' ').forEach(sub => list.push(this.schemaName(sub))));
         return list;
     }
-    addClass(element, className) {
-        element.classList.add(this.schemaName(className));
-    }
-    hasClass(element, className) {
-        element.classList.contains(this.schemaName(className));
-    }
-    toggleClass(element, className) {
-        element.classList.toggle(this.schemaName(className));
-    }
+    addClass = (element, className) => element.classList.add(this.schemaName(className));
+    hasClass = (element, className) => element.classList.contains(this.schemaName(className));
+    countClass = (parent, className) => parent.getElementsByClassName(className).length;
+    toggleClass = (element, className) => element.classList.toggle(this.schemaName(className));
     toggleOnClickOut(clickElement, className, applyClassToElement=clickElement) {
         className = this.schemaName(className);
         const listener = (e) => {
@@ -43,18 +38,25 @@ class htmlLibrary {
         });
     }
 
-    getAttribute(element, attributeName) {
-        return element[this.schemaName(attributeName, true)];
+    addCss = (doc, cssText, id) => this.buildElement(doc.head, 'style', [], {'id': this.schemaName(id)}, cssText);
+    getElement = (parent, id) => parent.getElementById(this.schemaName(id));
+    deleteElement = (element) => el.parent.removeNode(element);
+    clearElements(parent) {
+        while (parent.firstChild)
+            parent.firstChild.remove();
     }
-    setAttribute(element, attributeName, value) {
-        if (element)
-            element[this.schemaName(attributeName, true)] = value;
+    
+    getAttribute = (element, attributeName) => element[this.schemaName(attributeName, true)];
+    setAttribute = (element, attributeName, value) => element && (element[this.schemaName(attributeName, true)] = value);
+    incrementAttribute(element, attributeName, increaseBy=1) {
+        if (element) {
+            attributeName = this.schemaName(attributeName, true);
+            const value = parseInt(element.getAttribute(attributeName)) || 0;
+            element.setAttribute(attributeName, value + increaseBy);
+        }
     }
 
-    setOrDeleteAtKey(obj, key, value) {
-        value != null ? obj[key] = value : delete obj[key];
-    }
-
+    setOrDeleteAtKey = (obj, key, value) => value != null ? obj[key] = value : delete obj[key];
     setOrDeleteAtPath(obj, value, ...paths) {
         if (!paths)
             return value;
@@ -69,15 +71,13 @@ class htmlLibrary {
                 nextNode = {};
                 currentNode[path] = nextNode;
             }
-            currentNode = deeperValue;
+            currentNode = nextNode;
         }
         this.setOrDeleteAtKey(currentNode, paths[paths.length-1], value);
         return obj;
     }
     
-    schemaName(name, addDataPrefix=false) {
-        return !name.startsWith('-') ? name : `${addDataPrefix ? 'data-' : ''}${this.appSchema}${name}`;
-    }
+    schemaName = (name, addDataPrefix=false) => !name.startsWith('-') ? name : `${addDataPrefix ? 'data-' : ''}${this.appSchema}${name}`;
 
     async forEachSync(obj, callback) {
         if (!obj)
@@ -86,7 +86,7 @@ class htmlLibrary {
             for (const i = 0, l = obj.length; i < l; i++)
                 await callback(i, obj[i]);
         else
-            for (const prop of obj)
+            for (const prop of Object.keys(obj))
                 await callback(prop, obj[prop]);
     }
 
@@ -103,7 +103,6 @@ class htmlLibrary {
     setUserData = async (key, value) => await this.#storagePromise(this.#storageSyncSet, {[key]:value});
     setOrDeleteUserData = async (key, value) => value == null ? this.deleteUserData(key) : this.setUserData(key, value)
     deleteUserData = async key => await this.#storagePromise(this.#storageSyncRemove, key);
-
 
     #storageSyncSet = (data, fn) => chrome.storage.sync.set(data, fn);
     #storageSyncGet = (data, fn) => chrome.storage.sync.get(data, fn);

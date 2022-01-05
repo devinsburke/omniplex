@@ -4,12 +4,9 @@
     .omni-app-menu-container > * {
         cursor: pointer !important;
     }
-    .omni-app-menu-container:hover {
-        color: var(--form-info-anchor-hover-color);
+    .omni-app-menu-container:hover omni-menu-trigger {
+        display: inline-block;
     }
-        .omni-app-menu-container:hover omni-menu-trigger {
-            display: inline-block;
-        }
 
 omni-menu-trigger {
     display: none;
@@ -23,7 +20,6 @@ omni-menu-trigger {
         border-radius: 3px;
         color: var(--clickable-color-text);
         content: '\e161';
-        display: inline-block;
         font-family: 'plex-icons';
         height: 1.3em;
         line-height: 1;
@@ -57,7 +53,11 @@ omni-menu {
     z-index: 9999;
 }
     omni-menu omni-action {
+        color: var(--content-color-text);
         cursor: pointer;
+        display: block;
+        line-height: 1.5;
+        margin: 0.1em 0;
         white-space: nowrap;
     }
         omni-menu omni-action:hover {
@@ -71,3 +71,19 @@ omni-menu {
 .omni-hidden {
     display: none !important;
 }
+
+.plex-page-title omni-menu-trigger {
+    position: relative;
+}
+.plex-page-title omni-menu {
+    position: fixed;
+    transform: translateX(calc(1.3em - 100%)) translateY(1em);
+}
+.plex-page-title[data-omni-hidden-count] omni-menu-trigger {
+    display: inline-block;
+}
+    .plex-page-title[data-omni-hidden-count]:not(:hover) omni-menu-trigger::after {
+        background: transparent;
+        border: 0;
+        opacity: 0.3;
+    }

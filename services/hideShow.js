@@ -20,7 +20,7 @@ class HideShowService extends Service {
         for (const ctrl of this.appHandler.getControlElements(this.doc)) {
             const menu = await this.appendMenu(ctrl.labelElement);
             const attributes = ctrl.metadata.isRequired ? {'disabled': 'disabled'} : {};
-            const hideAction = this.lib.buildElement(menu, '-action', ['-hide-filter'], attributes, `Hide the ${ctrl.metadata.titleText} ${ctrl.metadata.controlType}`);
+            const hideAction = this.lib.buildElement(menu, '-action', ['-hide-filter'], attributes, `Hide ${ctrl.metadata.controlType}: ${ctrl.metadata.titleText}`);
             hideAction.addEventListener('click', async () => await this.hideControl(ctrl));
 
             const storedMetadata = settings[ctrl.metadata.uniqueId];
@@ -47,7 +47,7 @@ class HideShowService extends Service {
         );
         this.lib.clearElements(element);
         for (const ctrl of this.hiddenControls) {
-            const action = this.lib.buildElement(element, '-action', ['-hide-filter'], {}, `Unhide the ${ctrl.metadata.titleText} ${ctrl.metadata.controlType}`);
+            const action = this.lib.buildElement(element, '-action', ['-hide-filter'], {}, `Unhide ${ctrl.metadata.controlType}: ${ctrl.metadata.titleText}`);
             action.addEventListener('click', async () => await this.hideControl(ctrl));
         }
     }

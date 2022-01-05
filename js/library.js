@@ -47,14 +47,7 @@ class htmlLibrary {
     }
     
     getAttribute = (element, attributeName) => element[this.schemaName(attributeName, true)];
-    setAttribute = (element, attributeName, value) => element && (element[this.schemaName(attributeName, true)] = value);
-    incrementAttribute(element, attributeName, increaseBy=1) {
-        if (element) {
-            attributeName = this.schemaName(attributeName, true);
-            const value = parseInt(element.getAttribute(attributeName)) || 0;
-            element.setAttribute(attributeName, value + increaseBy);
-        }
-    }
+    setAttribute = (element, attributeName, value) => element && (element.setAttribute(this.schemaName(attributeName, true), value));
 
     setOrDeleteAtKey = (obj, key, value) => value != null ? obj[key] = value : delete obj[key];
     setOrDeleteAtPath(obj, value, ...paths) {

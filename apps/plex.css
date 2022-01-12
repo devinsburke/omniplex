@@ -20,6 +20,7 @@ omni-menu-trigger {
         border-radius: 3px;
         color: var(--clickable-color-text);
         content: '\e161';
+        display: inline-block;
         font-family: 'plex-icons';
         height: 1.3em;
         line-height: 1;

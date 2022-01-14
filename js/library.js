@@ -20,6 +20,8 @@ class htmlLibrary {
         return list;
     }
     addClass = (element, className) => element.classList.add(this.schemaName(className));
+    removeClass = (element, className) => element.classList.remove(this.schemaName(className));
+    setClass = (element, className, value) => value ? this.addClass(element, className) : this.removeClass(element, className);
     hasClass = (element, className) => element.classList.contains(this.schemaName(className));
     countClass = (parent, className) => parent.getElementsByClassName(className).length;
     toggleClass = (element, className) => element.classList.toggle(this.schemaName(className));
@@ -76,10 +78,10 @@ class htmlLibrary {
         if (!obj)
             return;
         else if (Array.isArray(obj))
-            for (const i = 0, l = obj.length; i < l; i++)
+            for (var i = 0, l = obj.length; i < l; i++)
                 await callback(i, obj[i]);
         else
-            for (const prop of Object.keys(obj))
+            for (var prop of Object.keys(obj))
                 await callback(prop, obj[prop]);
     }
 

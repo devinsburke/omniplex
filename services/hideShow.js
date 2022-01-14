@@ -16,17 +16,18 @@ class HideShowService extends Service {
 
         const title = this.appHandler.getTitleElement(this.doc);
         this.pageMenu = await this.appendMenu(title);
+        this.rebuildUnhideMenu(this.pageMenu);
 
         for (const ctrl of this.appHandler.getControlElements(this.doc)) {
             const menu = await this.appendMenu(ctrl.labelElement);
             const attributes = ctrl.metadata.isRequired ? {'disabled': 'disabled'} : {};
             const hideAction = this.lib.buildElement(menu, '-action', ['-hide-filter'], attributes, `Hide ${ctrl.metadata.controlType}: ${ctrl.metadata.titleText}`);
-            hideAction.addEventListener('click', async () => await this.hideControl(ctrl));
+            hideAction.addEventListener('click', async () => await this.setControlVisibility(ctrl, false));
 
             const storedMetadata = settings[ctrl.metadata.uniqueId];
             if (storedMetadata) {
                 ctrl.metadata = storedMetadata;
-                await this.hideControl(ctrl);
+                await this.setControlVisibility(ctrl, !storedMetadata.isHidden);
             }
         }
         this.lib.getElement(this.doc, '-explicit-hidden').remove();
@@ -40,30 +41,38 @@ class HideShowService extends Service {
         return menu;
     }
 
-    appendUnhideMenu(element) {
+    rebuildUnhideMenu(element) {
+        this.lib.clearElements(element);
+        if (this.hiddenControls.length == 0)
+            return;
         this.hiddenControls = this.hiddenControls.sort(
             (a, b) => a.metadata.controlType.localeCompare(b.metadata.controlType)
                 || a.metadata.titleText.localeCompare(b.metadata.titleText)
         );
-        this.lib.clearElements(element);
+        const action = this.lib.buildElement(element, '-action', ['-show-all'], {}, `Unhide all screen controls`);
+        action.addEventListener('click', async () => await this.lib.forEachSync(this.hiddenControls, async (_, c) => this.setControlVisibility(c, true)));
         for (const ctrl of this.hiddenControls) {
-            const action = this.lib.buildElement(element, '-action', ['-hide-filter'], {}, `Unhide ${ctrl.metadata.controlType}: ${ctrl.metadata.titleText}`);
-            action.addEventListener('click', async () => await this.hideControl(ctrl));
+            const action = this.lib.buildElement(element, '-action', ['-show-filter'], {}, `Unhide ${ctrl.metadata.controlType}: ${ctrl.metadata.titleText}`);
+            action.addEventListener('click', async () => await this.setControlVisibility(ctrl, true));
         }
     }
 
-    async hideControl(ctrl) {
-        this.lib.addClass(ctrl.containerElement, '-hidden');
-        this.lib.setAttribute(ctrl.containerElement, '-control-metadata', ctrl.metadata);
+    async setControlVisibility(ctrl, visible) {
+        this.lib.setClass(ctrl.containerElement, '-hidden', !visible);
         
-        if (!ctrl.metadata.isHidden) {
-            ctrl.metadata.isHidden = true;
-            await this.setPageSetting(window.location, ctrl.metadata, ctrl.metadata.uniqueId);
+        if (!ctrl.metadata.isHidden != visible) {
+            ctrl.metadata.isHidden = !visible;
+            const newValue = visible ? null : ctrl.metadata;
+            await this.setPageSetting(window.location, newValue, ctrl.metadata.uniqueId);
         }
 
+        if (visible) {
+            this.hiddenControls = this.hiddenControls.filter(c => c.metadata.uniqueId != ctrl.metadata.uniqueId);
+        } else {
+            this.hiddenControls.push(ctrl);
+        }
         const title = this.appHandler.getTitleElement(this.doc);
         this.lib.setAttribute(title, '-hidden-count', this.hiddenControls.length);
-        this.hiddenControls.push(ctrl);
-        this.appendUnhideMenu(this.pageMenu);
+        this.rebuildUnhideMenu(this.pageMenu);
     }
 }

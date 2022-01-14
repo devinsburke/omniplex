@@ -6,6 +6,7 @@ class PlexHandler extends AppHandler {
     };
 
     getPageId = (url) => `${url.host}${url.pathname}`;
+    getSsoLoginElement = (doc) => doc.getElementById('iamButton');
     getTitleElement = (doc) => doc.querySelector('.plex-page-title');
     *getControlElements(doc) {
         for (const [type, selector] of Object.entries(this.#controlSelectors)) {
